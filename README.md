@@ -1,4 +1,4 @@
-                                                                          Library Management System
+📚 Library Management System
 📝 Overview
 
 The Library Management System is a full-stack Java web application built using Spring Boot.
