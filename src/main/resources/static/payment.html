@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/0faddc1af8.js" crossorigin="anonymous"></script>
+    <title>Payment Page</title>
+    <style>
+      body {
+        background: linear-gradient(to bottom right, #6a11cb, #2575fc);
+        color: #fff;
+        font-family: 'Arial', sans-serif;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+        transition: background 0.5s ease;
+      }
+
+      .container {
+        background: #fff;
+        color: #333;
+        border-radius: 20px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+        padding: 40px;
+        max-width: 600px;
+        width: 100%;
+        transition: transform 0.3s ease;
+      }
+
+      h2 {
+        text-align: center;
+        color: #6a11cb;
+        font-weight: bold;
+        font-size: 32px;
+      }
+
+      .form-control {
+        border-radius: 10px;
+        padding: 12px 15px;
+        transition: all 0.3s ease;
+        border: 1px solid #ccc;
+      }
+
+      .form-control:focus {
+        border-color: #6a11cb;
+        box-shadow: 0 0 10px rgba(106, 17, 203, 0.5);
+      }
+
+      .btn-primary {
+        background-color: #6a11cb;
+        border: none;
+        padding: 14px 24px;
+        font-size: 18px;
+        font-weight: bold;
+        width: 100%;
+        border-radius: 8px;
+        transition: transform 0.2s ease, background-color 0.3s ease;
+      }
+
+      .btn-primary:hover {
+        background-color: #2575fc;
+        transform: translateY(-3px);
+      }
+
+      .popup {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #fff;
+        border-radius: 20px;
+        text-align: center;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+        padding: 40px;
+        animation: fadeIn 0.5s;
+        max-width: 400px;
+        width: 100%;
+      }
+
+      .popup h3 {
+        color: #28a745;
+        font-size: 24px;
+        font-weight: bold;
+      }
+
+      .popup p {
+        color: #383d41;
+        font-size: 16px;
+        margin-top: 20px;
+      }
+
+      .overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      .card-preview {
+        background: linear-gradient(to bottom right, #6a11cb, #9b4dca); /* Purple gradient background */
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+        color: #fff; /* White text color */
+        border: 1px solid #fff; /* White border */
+      }
+
+      .card-preview h5 {
+        color: #fff;
+        font-size: 20px;
+        font-weight: bold;
+      }
+
+      .card-preview p {
+        color: #f0f0f0;
+        font-size: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Secure Payment</h2>
+      <form id="paymentForm">
+        <div class="mb-3">
+          <label for="cardName" class="form-label">Cardholder's Name</label>
+          <input type="text" class="form-control" id="cardName" name="cardName" placeholder="John Doe" required>
+        </div>
+        <div class="mb-3">
+          <label for="cardNumber" class="form-label">Card Number</label>
+          <input type="text" class="form-control" id="cardNumber" name="cardNumber" placeholder="1234 5678 9101 1121" required pattern="\d{16}">
+        </div>
+        <div class="mb-3">
+          <label for="expiryDate" class="form-label">Expiry Date</label>
+          <input type="month" class="form-control" id="expiryDate" name="expiryDate" required>
+        </div>
+        <div class="mb-3">
+          <label for="cvv" class="form-label">CVV</label>
+          <input type="password" class="form-control" id="cvv" name="cvv" placeholder="123" required pattern="\d{3}">
+        </div>
+        <div class="d-grid mt-4">
+          <button type="button" class="btn btn-primary" onclick="processPayment()">Submit Payment</button>
+        </div>
+      </form>
+      <div class="card-preview">
+        <h5>Card Preview</h5>
+        <p><strong>Cardholder:</strong> <span id="previewName">John Doe</span></p>
+        <p><strong>Card Number:</strong> <span id="previewNumber">#### #### #### ####</span></p>
+        <p><strong>Expiry:</strong> <span id="previewExpiry">MM/YYYY</span></p>
+      </div>
+    </div>
+
+    <!-- Popup -->
+    <div class="overlay" id="overlay"></div>
+    <div class="popup" id="popup">
+      <i class="fas fa-check-circle fa-3x" style="color: #28a745;"></i>
+      <h3>Payment Successful!</h3>
+      <p>Your payment has been processed securely.</p>
+      <button class="btn btn-primary" onclick="closePopup()">Close</button>
+    </div>
+
+    <script>
+      const cardName = document.getElementById('cardName');
+      const cardNumber = document.getElementById('cardNumber');
+      const expiryDate = document.getElementById('expiryDate');
+      const previewName = document.getElementById('previewName');
+      const previewNumber = document.getElementById('previewNumber');
+      const previewExpiry = document.getElementById('previewExpiry');
+
+      cardName.addEventListener('input', () => {
+        previewName.textContent = cardName.value || 'John Doe';
+      });
+
+      cardNumber.addEventListener('input', () => {
+        previewNumber.textContent = cardNumber.value.replace(/(\d{4})(?=\d)/g, '$1 ') || '#### #### #### ####';
+      });
+
+      expiryDate.addEventListener('input', () => {
+        previewExpiry.textContent = expiryDate.value || 'MM/YYYY';
+      });
+
+      function processPayment() {
+        const form = document.getElementById('paymentForm');
+        if (form.checkValidity()) {
+          document.getElementById('popup').style.display = 'block';
+          document.getElementById('overlay').style.display = 'block';
+        } else {
+          form.reportValidity();
+        }
+      }
+
+      function closePopup() {
+        document.getElementById('popup').style.display = 'none';
+        document.getElementById('overlay').style.display = 'none';
+        window.location.href = '/'; // Redirect to the home page
+      }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
