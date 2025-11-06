@@ -5,8 +5,8 @@ The Library Management System is a full-stack Java web application built using S
 It helps manage books, users, and transactions efficiently in a digital library setup.
 Users can register, log in, browse available books, issue and return them, and administrators can manage the inventory.
 
-🧩 Project Structure
 ```bash
+🧩 Project Structure
 bookstore-main/
 │
 ├── src/
