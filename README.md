@@ -6,7 +6,7 @@ It helps manage books, users, and transactions efficiently in a digital library 
 Users can register, log in, browse available books, issue and return them, and administrators can manage the inventory.
 
 🧩 Project Structure
-
+```bash
 bookstore-main/
 │
 ├── src/
